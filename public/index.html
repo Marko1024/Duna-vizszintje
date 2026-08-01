@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Élő Duna vízállás Magyarországon – Budapest, Nagymaros, Mohács, Baja és további mérőállomások az OVF Hydroinfo adatai alapján."
+    />
+    <title>Duna Vízállás – élő vízszint Magyarországon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-grain" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="logo" href="#top">Duna Vízállás</a>
+      <nav class="nav">
+        <a href="#allomasok">Állomások</a>
+        <a href="#grafikon">Grafikon</a>
+        <a href="#terkep">Térkép</a>
+        <a href="#riasztas">Riasztás</a>
+      </nav>
+      <button type="button" class="btn btn-ghost" id="refreshBtn" title="Frissítés">
+        Frissítés
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-media" aria-hidden="true">
+          <div class="hero-wash"></div>
+        </div>
+        <div class="hero-content">
+          <p class="brand-mark">Duna Vízállás</p>
+          <h1>A folyó aktuális hangulata, centiméterre pontosan.</h1>
+          <p class="lede">
+            Élő vízállás a magyar Duna-szakasz fő mérőállomásain — az OVF
+            Hydroinfo hivatalos hidrológiai adatai alapján.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#allomasok">Állomások megtekintése</a>
+            <button type="button" class="btn btn-secondary" id="heroRefreshBtn">
+              Adatok frissítése
+            </button>
+          </div>
+          <p class="meta-line" id="metaLine">Adatok betöltése…</p>
+        </div>
+      </section>
+
+      <section class="section" id="allomasok">
+        <div class="section-head">
+          <h2>Mérőállomások</h2>
+          <p>
+            Aktuális vízállás, napi és heti változás, trend és színkódolt
+            státusz (kisvíz / normál / árvízfokozat).
+          </p>
+        </div>
+        <div class="legend" aria-label="Színkódolás">
+          <span class="pill status-low">Kisvíz</span>
+          <span class="pill status-normal">Normál</span>
+          <span class="pill status-flood1">I. fok</span>
+          <span class="pill status-flood2">II. fok</span>
+          <span class="pill status-flood3">III. fok</span>
+        </div>
+        <div class="station-grid" id="stationGrid"></div>
+      </section>
+
+      <section class="section" id="grafikon">
+        <div class="section-head">
+          <h2>Vízállás-alakulás</h2>
+          <p>Interaktív grafikon állomásonként, 7 vagy 30 napos ablakban.</p>
+        </div>
+        <div class="chart-toolbar">
+          <label>
+            Állomás
+            <select id="chartStation"></select>
+          </label>
+          <div class="segmented" role="group" aria-label="Időablak">
+            <button type="button" class="seg active" data-days="7">7 nap</button>
+            <button type="button" class="seg" data-days="30">30 nap</button>
+          </div>
+          <label class="check">
+            <input type="checkbox" id="compareFloods" />
+            2002 / 2013 árvíz szint
+          </label>
+        </div>
+        <div class="chart-shell">
+          <canvas id="levelChart" height="120"></canvas>
+        </div>
+      </section>
+
+      <section class="section" id="terkep">
+        <div class="section-head">
+          <h2>Térkép</h2>
+          <p>A mérőállomások helye a Duna mentén — kattints a részletekért.</p>
+        </div>
+        <div id="map" class="map" role="region" aria-label="Duna mérőállomások térképe"></div>
+      </section>
+
+      <section class="section" id="riasztas">
+        <div class="section-head">
+          <h2>Riasztás beállítása</h2>
+          <p>
+            Böngésző-értesítés, ha egy állomás túllépi a megadott küszöböt.
+            Az e-mail / push küldéshez később backend szolgáltatás köthető.
+          </p>
+        </div>
+        <form class="alert-form" id="alertForm">
+          <label>
+            Állomás
+            <select id="alertStation" required></select>
+          </label>
+          <label>
+            Küszöb (cm)
+            <input type="number" id="alertThreshold" value="500" required />
+          </label>
+          <label>
+            E-mail (opcionális, helyi mentés)
+            <input type="email" id="alertEmail" placeholder="pelda@email.hu" />
+          </label>
+          <button type="submit" class="btn btn-primary">Riasztás mentése</button>
+        </form>
+        <ul class="alert-list" id="alertList"></ul>
+      </section>
+
+      <section class="section about">
+        <div class="section-head">
+          <h2>Adatforrás</h2>
+          <p>
+            Az oldal az
+            <a href="https://www.hydroinfo.hu/tables/dunhid.html" target="_blank" rel="noopener"
+              >hydroinfo.hu</a
+            >
+            nyilvános napi tábláját és az éves reggeli vízállás sorait olvassa be.
+            A VRAQuery API (
+            <a
+              href="https://vmservice.vizugy.hu/vraquery/swagger/index.html"
+              target="_blank"
+              rel="noopener"
+              >vmservice.vizugy.hu</a
+            >)
+            autentikációt igényel; amíg az nincs bekötve, a scraping / mock réteg
+            biztosítja a működést.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Duna Vízállás · tájékoztató jellegű megjelenítés · forrás:
+        Országos Vízügyi Főigazgatóság
+      </p>
+    </footer>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
