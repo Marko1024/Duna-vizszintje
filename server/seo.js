@@ -164,13 +164,12 @@ function buildAdSlot(slotId, extraClass = "") {
   <p class="ad-label">Hirdetés</p>
   <ins
     class="adsbygoogle"
-    style="display:block"
+    style="display:block;min-height:100px"
     data-ad-client="ca-pub-9316553426322212"
     data-ad-slot="${escapeHtml(id)}"
     data-ad-format="auto"
     data-full-width-responsive="true"
   ></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </aside>`;
 }
 

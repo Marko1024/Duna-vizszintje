@@ -44,6 +44,112 @@ function trendClass(trend) {
   return `trend-${trend || "stable"}`;
 }
 
+function loadCss(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = href;
+  document.head.appendChild(link);
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error(`Nem sikerült betölteni: ${src}`));
+    document.body.appendChild(s);
+  });
+}
+
+let libsPromise = null;
+async function ensureMapChartLibs() {
+  if (window.L && window.Chart) return;
+  if (libsPromise) return libsPromise;
+  libsPromise = (async () => {
+    loadCss("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+    await Promise.all([
+      loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"),
+      loadScript("https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"),
+    ]);
+  })();
+  return libsPromise;
+}
+
+function whenIdle(fn, timeout = 4000) {
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(() => fn(), { timeout });
+  } else {
+    setTimeout(fn, 1800);
+  }
+}
+
+function loadAdSenseAfterLcp() {
+  const boot = () => {
+    if (document.getElementById("adsense-loader")) return;
+    const s = document.createElement("script");
+    s.id = "adsense-loader";
+    s.async = true;
+    s.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9316553426322212";
+    s.crossOrigin = "anonymous";
+    s.onload = () => {
+      document.querySelectorAll("ins.adsbygoogle").forEach(() => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch {
+          /* ignore */
+        }
+      });
+    };
+    document.body.appendChild(s);
+  };
+
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    whenIdle(boot, 2500);
+  };
+
+  ["scroll", "click", "touchstart", "keydown"].forEach((evt) => {
+    window.addEventListener(evt, run, { once: true, passive: true });
+  });
+  setTimeout(run, 3500);
+}
+
+function observeHeavySections() {
+  const chartEl = document.getElementById("grafikon");
+  const mapEl = document.getElementById("terkep");
+  if (!("IntersectionObserver" in window)) {
+    ensureMapChartLibs().then(() => {
+      renderChart();
+      renderMap();
+    });
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        ensureMapChartLibs().then(() => {
+          if (entry.target.id === "grafikon") renderChart();
+          if (entry.target.id === "terkep") renderMap();
+        });
+        io.unobserve(entry.target);
+      }
+    },
+    { rootMargin: "240px 0px" }
+  );
+  if (chartEl) io.observe(chartEl);
+  if (mapEl) io.observe(mapEl);
+}
+
 async function loadLevels(force = false) {
   if (!force && window.__INITIAL_DATA__?.stations?.length) {
     const boot = window.__INITIAL_DATA__;
@@ -147,6 +253,7 @@ function seriesForStation(station, days) {
 }
 
 function renderChart() {
+  if (!window.Chart || !state.data) return;
   const station = state.data.stations.find((s) => s.id === state.selectedId);
   if (!station) return;
   const series = seriesForStation(station, state.days);
@@ -242,6 +349,7 @@ function renderChart() {
 }
 
 function initMap() {
+  if (!window.L) return;
   if (state.map) return;
   state.map = L.map("map", { scrollWheelZoom: false }).setView(
     [47.2, 18.9],
@@ -266,7 +374,9 @@ function markerColor(status) {
 }
 
 function renderMap() {
+  if (!window.L || !state.data) return;
   initMap();
+  if (!state.map) return;
   state.markers.forEach((m) => m.remove());
   state.markers = [];
   const bounds = [];
@@ -398,8 +508,8 @@ async function refresh(force = false) {
     renderMeta();
     fillSelects();
     renderCards();
-    renderChart();
-    renderMap();
+    if (window.Chart) renderChart();
+    if (window.L) renderMap();
     await maybeNotify();
   } catch (err) {
     $("#metaLine").textContent = `Hiba az adatok betöltésekor: ${err.message}`;
@@ -419,8 +529,10 @@ function wireUi() {
   $("#chartStation").addEventListener("change", (e) => {
     state.selectedId = e.target.value;
     renderCards();
-    renderChart();
-    focusMarker(state.selectedId);
+    ensureMapChartLibs().then(() => {
+      renderChart();
+      focusMarker(state.selectedId);
+    });
   });
 
   document.querySelectorAll(".seg").forEach((btn) => {
@@ -428,13 +540,13 @@ function wireUi() {
       document.querySelectorAll(".seg").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       state.days = Number(btn.dataset.days);
-      renderChart();
+      ensureMapChartLibs().then(() => renderChart());
     });
   });
 
   $("#compareFloods").addEventListener("change", (e) => {
     state.compareFloods = e.target.checked;
-    renderChart();
+    ensureMapChartLibs().then(() => renderChart());
   });
 
   $("#alertForm").addEventListener("submit", async (e) => {
@@ -466,4 +578,6 @@ function wireUi() {
 wireUi();
 renderAlerts();
 refresh(false);
+observeHeavySections();
+loadAdSenseAfterLcp();
 setInterval(() => refresh(true), REFRESH_MS);

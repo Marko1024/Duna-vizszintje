@@ -1,3 +1,37 @@
+/* Self-hosted fonts — no render-blocking Google Fonts request */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 700 800;
+  font-display: optional;
+  src: url("/fonts/bricolage-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 700 800;
+  font-display: optional;
+  src: url("/fonts/bricolage-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: optional;
+  src: url("/fonts/figtree-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: optional;
+  src: url("/fonts/figtree-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   --ink: #0c1f28;
   --ink-soft: #243b45;
@@ -17,8 +51,8 @@
   --line: rgba(12, 31, 40, 0.12);
   --shadow: 0 18px 50px rgba(8, 40, 50, 0.18);
   --radius: 18px;
-  --font-display: "Bricolage Grotesque", Georgia, serif;
-  --font-body: "Figtree", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Iowan Old Style", Palatino, Georgia, serif;
+  --font-body: "Figtree", "Avenir Next", "Segoe UI", Candara, sans-serif;
 }
 
 *,
@@ -52,9 +86,10 @@ a {
   pointer-events: none;
   position: fixed;
   inset: 0;
-  opacity: 0.08;
+  opacity: 0.04;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: radial-gradient(rgba(12, 31, 40, 0.35) 0.6px, transparent 0.7px);
+  background-size: 3px 3px;
 }
 
 .site-header,
@@ -154,19 +189,21 @@ main,
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, rgba(8, 56, 68, 0.55), rgba(8, 56, 68, 0.15)),
-    url("https://images.unsplash.com/photo-1555990793-da1111822b21?auto=format&fit=crop&w=2000&q=80")
-      center/cover no-repeat;
-  transform: scale(1.04);
-  animation: drift 18s ease-in-out infinite alternate;
+    radial-gradient(900px 420px at 78% 18%, rgba(224, 164, 90, 0.22), transparent 60%),
+    radial-gradient(700px 500px at 12% 80%, rgba(31, 138, 154, 0.35), transparent 55%),
+    linear-gradient(135deg, #062b35 0%, #0e5f6d 48%, #145866 100%);
 }
 
 .hero-wash {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(8, 56, 68, 0.25) 0%, rgba(8, 56, 68, 0.72) 70%, rgba(8, 56, 68, 0.92) 100%),
-    radial-gradient(700px 280px at 70% 30%, rgba(224, 164, 90, 0.18), transparent 70%);
+    linear-gradient(180deg, rgba(8, 56, 68, 0.15) 0%, rgba(8, 56, 68, 0.55) 62%, rgba(8, 56, 68, 0.88) 100%),
+    repeating-linear-gradient(
+      -12deg,
+      transparent 0 14px,
+      rgba(243, 247, 248, 0.03) 14px 15px
+    );
 }
 
 .hero-content {
@@ -221,6 +258,13 @@ main,
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 3.5rem 0 1rem;
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+#aktualis,
+#allomasok {
+  content-visibility: visible;
 }
 
 .section-head h2 {
@@ -617,20 +661,11 @@ input[type="email"] {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes drift {
-  from {
-    transform: scale(1.04) translate3d(0, 0, 0);
-  }
-  to {
-    transform: scale(1.08) translate3d(-1.5%, -1%, 0);
   }
 }
 
