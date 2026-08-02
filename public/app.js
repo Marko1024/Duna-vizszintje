@@ -51,6 +51,124 @@ async function loadLevels(force = false) {
   return res.json();
 }
 
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function safeUrl(url) {
+  if (!url) return "#";
+  const value = String(url).trim();
+  if (value.startsWith("#") || value.startsWith("/")) return value;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.href;
+    }
+  } catch {
+    /* ignore */
+  }
+  return "#";
+}
+
+function renderAdBanner(ad, slotMeta) {
+  const label = slotMeta?.label || "Szponzorált";
+  const href = safeUrl(ad.url);
+  const external = href.startsWith("http");
+  return `
+    <article class="ad-banner">
+      <p class="ad-banner-label">${escapeHtml(label)}</p>
+      <h3>${escapeHtml(ad.title)}</h3>
+      ${ad.body ? `<p>${escapeHtml(ad.body)}</p>` : ""}
+      <div class="ad-banner-meta">
+        ${ad.sponsor ? `<span class="ad-sponsor">${escapeHtml(ad.sponsor)}</span>` : "<span></span>"}
+        <a class="btn btn-secondary" href="${escapeHtml(href)}"${
+          external ? ' target="_blank" rel="noopener sponsored"' : ""
+        }>${escapeHtml(ad.cta || "Megnézem")}</a>
+      </div>
+    </article>
+  `;
+}
+
+function renderAdSlots(payload) {
+  const bySlot = { mid: [], footer: [] };
+  for (const ad of payload.ads || []) {
+    if (!bySlot[ad.slot]) bySlot[ad.slot] = [];
+    bySlot[ad.slot].push(ad);
+  }
+
+  const mid = $("#adSlotMid");
+  const footer = $("#adSlotFooter");
+
+  if (mid) {
+    if (bySlot.mid?.length) {
+      mid.hidden = false;
+      mid.innerHTML = bySlot.mid
+        .map((ad) => renderAdBanner(ad, payload.slots?.mid))
+        .join("");
+    } else {
+      mid.hidden = true;
+      mid.innerHTML = "";
+    }
+  }
+
+  if (footer) {
+    if (bySlot.footer?.length) {
+      footer.hidden = false;
+      footer.innerHTML = bySlot.footer
+        .map((ad) => renderAdBanner(ad, payload.slots?.footer))
+        .join("");
+    } else {
+      footer.hidden = true;
+      footer.innerHTML = "";
+    }
+  }
+}
+
+async function loadAds() {
+  try {
+    const res = await fetch("/api/ads", { cache: "no-store" });
+    if (!res.ok) throw new Error(`Ads API hiba: ${res.status}`);
+    const data = await res.json();
+    renderAdSlots(data);
+  } catch {
+    const mid = $("#adSlotMid");
+    const footer = $("#adSlotFooter");
+    if (mid) mid.hidden = true;
+    if (footer) footer.hidden = true;
+  }
+}
+
+async function submitAdInquiry(form) {
+  const note = $("#adFormNote");
+  const payload = {
+    name: form.name.value.trim(),
+    email: form.email.value.trim(),
+    company: form.company.value.trim(),
+    website: form.website.value.trim(),
+    message: form.message.value.trim(),
+  };
+  note.className = "form-note span-2";
+  note.textContent = "Küldés…";
+
+  const res = await fetch("/api/ads/inquiry", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || `Hiba: ${res.status}`);
+  }
+  form.reset();
+  note.className = "form-note span-2 is-ok";
+  note.textContent = data.message || "Köszönjük! Hamarosan jelentkezünk.";
+}
+
 function renderMeta() {
   const meta = $("#metaLine");
   if (!state.data) return;
@@ -456,9 +574,28 @@ function wireUi() {
     renderAlerts();
     await maybeNotify();
   });
+
+  const adForm = $("#adInquiryForm");
+  if (adForm) {
+    adForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const note = $("#adFormNote");
+      const btn = adForm.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await submitAdInquiry(adForm);
+      } catch (err) {
+        note.className = "form-note span-2 is-error";
+        note.textContent = err.message || "Nem sikerült elküldeni.";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
 }
 
 wireUi();
 renderAlerts();
+loadAds();
 refresh(false);
 setInterval(() => refresh(true), REFRESH_MS);

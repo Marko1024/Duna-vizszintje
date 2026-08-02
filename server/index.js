@@ -1,6 +1,7 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getPublicAds, saveInquiry } from "./ads.js";
 import { fetchLiveData, getCacheInfo } from "./scrape.js";
 import { STATIONS } from "./stations.js";
 
@@ -17,6 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.json({ limit: "32kb" }));
+
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, cache: getCacheInfo() });
 });
@@ -32,6 +35,34 @@ app.get("/api/levels", async (req, res) => {
     res.json(data);
   } catch (err) {
     res.status(500).json({
+      ok: false,
+      error: String(err.message || err),
+    });
+  }
+});
+
+app.get("/api/ads", async (_req, res) => {
+  try {
+    const data = await getPublicAds();
+    res.json({ ok: true, ...data });
+  } catch (err) {
+    res.status(500).json({
+      ok: false,
+      error: String(err.message || err),
+    });
+  }
+});
+
+app.post("/api/ads/inquiry", async (req, res) => {
+  try {
+    const entry = await saveInquiry(req.body || {});
+    res.status(201).json({
+      ok: true,
+      id: entry.id,
+      message: "Köszönjük! Hamarosan felvesszük veled a kapcsolatot.",
+    });
+  } catch (err) {
+    res.status(err.status || 500).json({
       ok: false,
       error: String(err.message || err),
     });

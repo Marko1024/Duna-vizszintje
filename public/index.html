@@ -32,6 +32,7 @@
         <a href="#grafikon">Grafikon</a>
         <a href="#terkep">Térkép</a>
         <a href="#riasztas">Riasztás</a>
+        <a href="#hirdetes">Hirdetés</a>
       </nav>
       <button type="button" class="btn btn-ghost" id="refreshBtn" title="Frissítés">
         Frissítés
@@ -77,6 +78,8 @@
         </div>
         <div class="station-grid" id="stationGrid"></div>
       </section>
+
+      <aside class="ad-slot" id="adSlotMid" data-slot="mid" hidden></aside>
 
       <section class="section" id="grafikon">
         <div class="section-head">
@@ -136,6 +139,40 @@
         <ul class="alert-list" id="alertList"></ul>
       </section>
 
+      <section class="section" id="hirdetes">
+        <div class="section-head">
+          <h2>Hirdetés az oldalon</h2>
+          <p>
+            Partner megjelenés vízisport, turizmus és helyi szolgáltatásoknak.
+            Töltsd ki az űrlapot, és felvesszük veled a kapcsolatot.
+          </p>
+        </div>
+        <form class="ad-form" id="adInquiryForm">
+          <label>
+            Név
+            <input type="text" id="adName" name="name" required maxlength="120" autocomplete="name" />
+          </label>
+          <label>
+            E-mail
+            <input type="email" id="adEmail" name="email" required maxlength="180" autocomplete="email" />
+          </label>
+          <label>
+            Cég / márka
+            <input type="text" id="adCompany" name="company" maxlength="160" autocomplete="organization" />
+          </label>
+          <label>
+            Weboldal
+            <input type="url" id="adWebsite" name="website" maxlength="300" placeholder="https://" />
+          </label>
+          <label class="span-2">
+            Mit szeretnél hirdetni?
+            <textarea id="adMessage" name="message" required maxlength="2000" rows="4" placeholder="Rövid leírás, célközönség, időtartam…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary span-2">Hirdetésfeladás kérése</button>
+          <p class="form-note span-2" id="adFormNote" role="status"></p>
+        </form>
+      </section>
+
       <section class="section about">
         <div class="section-head">
           <h2>Adatforrás</h2>
@@ -159,10 +196,16 @@
       </section>
     </main>
 
+    <aside class="ad-slot ad-slot-footer" id="adSlotFooter" data-slot="footer" hidden></aside>
+
     <footer class="site-footer">
       <p>
         Duna Vízállás · tájékoztató jellegű megjelenítés · forrás:
         Országos Vízügyi Főigazgatóság
+      </p>
+      <p class="footer-ads-hint">
+        Hirdetnél?
+        <a href="#hirdetes">Írj nekünk</a>
       </p>
     </footer>
 

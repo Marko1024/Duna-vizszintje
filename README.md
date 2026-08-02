@@ -11,6 +11,7 @@
 - Automatikus óránkénti frissítés + manuális frissítés gomb
 - Reszponzív, mobilbarát felület
 - Böngésző-riasztás küszöbre (localStorage); e-mail mező helyi mentéssel (küldéshez külön szolgáltatás kell)
+- Szponzorált hirdetések + hirdetésfeladási űrlap
 
 ## Adatforrás
 
@@ -24,6 +25,38 @@ A hivatalos **VRAQuery** API (`https://vmservice.vizugy.hu/vraquery`) autentiká
 ### Győr megjegyzés
 
 A „Győr” városi vízmérce a Rábán van. A Dunai szakaszhoz az oldal a **Gönyű** állomást használja (`Győr (Gönyű)`).
+
+## Hirdetések
+
+Két mód van hirdetés megjelenítésére:
+
+### 1) Partner hirdetés (`data/ads.json`)
+
+Szerkeszd a `data/ads.json` fájlt, majd indítsd újra / frissítsd az oldalt:
+
+```json
+{
+  "id": "partner-1",
+  "slot": "mid",
+  "active": true,
+  "title": "Címsor",
+  "body": "Rövid szöveg",
+  "cta": "Megnézem",
+  "url": "https://pelda.hu",
+  "sponsor": "Partner neve",
+  "startsAt": "2026-08-01T00:00:00Z",
+  "endsAt": "2026-09-01T00:00:00Z"
+}
+```
+
+- `slot`: `mid` (állomások után) vagy `footer` (lábléc előtt)
+- `active: false` → ideiglenes kikapcsolás
+- `startsAt` / `endsAt` → opcionális időablak (ISO dátum)
+- Kapcsolati e-mail: `contactEmail` a JSON-ban, vagy `ADS_CONTACT_EMAIL` környezeti változó
+
+### 2) Hirdetésfeladás az oldalról
+
+A látogatók a **Hirdetés** szekcióban (`/#hirdetes`) kérhetnek megjelenést. A beküldések a szerveren a `data/ad-inquiries.json` fájlba kerülnek (ez a gitben nincs nyomon követve).
 
 ## Indítás
 
@@ -54,6 +87,8 @@ npm run scrape
 | `GET /api/levels?force=1` | Cache megkerülése, azonnali újraolvasás |
 | `GET /api/stations` | Állomás metaadatok (küszöbök, koordináták) |
 | `GET /api/health` | Egészség / cache infó |
+| `GET /api/ads` | Aktív hirdetések a slotokra |
+| `POST /api/ads/inquiry` | Hirdetésfeladási érdeklődés (JSON: name, email, message, …) |
 
 ## Technológia
 

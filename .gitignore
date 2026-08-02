@@ -6,3 +6,4 @@ npm-debug.log*
 .vercel
 dist/
 coverage/
+data/ad-inquiries.json

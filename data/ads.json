@@ -1,0 +1,37 @@
+{
+  "contactEmail": "bfhdsjdbf@gmail.com",
+  "slots": {
+    "mid": {
+      "label": "Szponzorált",
+      "enabled": true
+    },
+    "footer": {
+      "label": "Partner",
+      "enabled": true
+    }
+  },
+  "ads": [
+    {
+      "id": "demo-hajozas",
+      "slot": "mid",
+      "active": true,
+      "title": "Hajózz biztonságosan a Dunán",
+      "body": "Aktuális vízállás-figyelés mellé: hajózási tippek és felszerelés a folyómenti túrákhoz.",
+      "cta": "Megnézem",
+      "url": "https://www.vizugy.hu/",
+      "image": null,
+      "sponsor": "Példa partner"
+    },
+    {
+      "id": "demo-partner-footer",
+      "slot": "footer",
+      "active": true,
+      "title": "Hirdess a Duna Vízállás oldalon",
+      "body": "Célzott megjelenés vízisport, turizmus és helyi szolgáltatások számára.",
+      "cta": "Érdekel",
+      "url": "#hirdetes",
+      "image": null,
+      "sponsor": "Duna Vízállás"
+    }
+  ]
+}
