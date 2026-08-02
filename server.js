@@ -89,6 +89,13 @@ async function renderHome(_req, res) {
 app.get("/", renderHome);
 app.get("/index.html", renderHome);
 
+// Google Search Console HTML-file verification (must not fall through to SSR)
+app.get("/google93a8ec78c8a76b70.html", (_req, res) => {
+  res
+    .type("text/html")
+    .send("google-site-verification: google93a8ec78c8a76b70.html\n");
+});
+
 app.use(
   express.static(publicDir, {
     extensions: ["html"],
@@ -97,7 +104,15 @@ app.use(
   })
 );
 
-app.use(renderHome);
+// Unknown paths → 404 (ne SSR homepage legyen a verifikációs URL-eken)
+app.use((req, res) => {
+  if (req.accepts("html")) {
+    res.status(404).type("html").send("<!doctype html><title>404</title><h1>404</h1>");
+    return;
+  }
+  res.status(404).json({ ok: false, error: "Not found" });
+});
+
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
