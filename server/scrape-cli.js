@@ -5,6 +5,8 @@ console.log(
   JSON.stringify(
     {
       mode: data.mode,
+      source: data.source,
+      auth: data.auth,
       observedAt: data.observedAt,
       warning: data.warning,
       stations: data.stations.map((s) => ({
@@ -14,6 +16,7 @@ console.log(
         change7dCm: s.change7dCm,
         status: s.status,
         historyPoints: s.historySeries?.length ?? 0,
+        dataSource: s.source,
       })),
     },
     null,

@@ -140,20 +140,20 @@
         <div class="section-head">
           <h2>Adatforrás</h2>
           <p>
-            Az oldal az
-            <a href="https://www.hydroinfo.hu/tables/dunhid.html" target="_blank" rel="noopener"
-              >hydroinfo.hu</a
-            >
-            nyilvános napi tábláját és az éves reggeli vízállás sorait olvassa be.
-            A VRAQuery API (
-            <a
+            Elsődleges forrás az OVF <strong>VRAQuery</strong> API
+            (<a
               href="https://vmservice.vizugy.hu/vraquery/swagger/index.html"
               target="_blank"
               rel="noopener"
               >vmservice.vizugy.hu</a
             >)
-            autentikációt igényel; amíg az nincs bekötve, a scraping / mock réteg
-            biztosítja a működést.
+            nyilvános open-data tokennel. Ha az API nem elérhető, az oldal a
+            <a href="https://www.hydroinfo.hu/tables/dunhid.html" target="_blank" rel="noopener"
+              >hydroinfo.hu</a
+            >
+            HTML tábláira esik vissza. Hivatalos felhasználónév/jelszó esetén
+            állítsd be a <code>VIZUGY_USERNAME</code> /
+            <code>VIZUGY_PASSWORD</code> környezeti változókat.
           </p>
         </div>
       </section>

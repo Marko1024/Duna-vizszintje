@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchLiveData, getCacheInfo } from "./server/scrape.js";
 import { STATIONS } from "./server/stations.js";
+import { getTokenInfo } from "./server/vra.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "public");
@@ -12,7 +13,6 @@ const PORT = Number(process.env.PORT || 3000);
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  // API: no long browser cache; static assets handled separately below
   if (req.path.startsWith("/api/")) {
     res.setHeader("Cache-Control", "no-store");
   }
@@ -20,7 +20,13 @@ app.use((req, res, next) => {
 });
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, cache: getCacheInfo(), runtime: "vercel-express" });
+  res.json({
+    ok: true,
+    cache: getCacheInfo(),
+    vra: getTokenInfo(),
+    dataSource: process.env.DATA_SOURCE || "auto",
+    runtime: process.env.VERCEL ? "vercel-express" : "node",
+  });
 });
 
 app.get("/api/stations", (_req, res) => {
@@ -51,7 +57,6 @@ app.use((_req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 
-// Local / classic Node hosting. On Vercel the platform invokes the exported app.
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Duna vízállás → http://localhost:${PORT}`);

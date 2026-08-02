@@ -10,16 +10,43 @@
 - Leaflet térkép az állomásokkal
 - Automatikus óránkénti frissítés + manuális frissítés gomb
 - Reszponzív, mobilbarát felület
-- Böngésző-riasztás küszöbre (localStorage); e-mail mező helyi mentéssel (küldéshez külön szolgáltatás kell)
+- Böngésző-riasztás küszöbre (localStorage)
 
-## Adatforrás
+## Adatforrás — hogyan van bekötve az API?
 
-Az API az OVF **Hydroinfo** nyilvános HTML tábláit olvassa be:
+**Elsődleges:** OVF **VRAQuery** API (`https://vmservice.vizugy.hu/vraquery`)
 
-- Napi tábla: https://www.hydroinfo.hu/tables/dunhid.html
-- Éves reggeli sorok: `https://www.hydroinfo.hu/Html/hidinfo/AktualisEvesTb/tb{ÁLLOMÁSKÓD}.htm`
+| Lépés | Mit csinál |
+| --- | --- |
+| 1. Token | Nyilvános open-data JWT a `https://data.vizugy.hu/AuthApi/auth/token` végpontról (`Origin: https://data.vizugy.hu`) |
+| 2. Idősor | `POST /TS/TsShortList` — `AdatFajtaKod=68` (Felszíni vízállás), `AdatTipusKod=100` (operatív) |
+| 3. Állomások | VRA törzsszámok: Gönyű `4`, Esztergom `8`, Nagymaros `1020`, Budapest `1026`, Dunaújváros `547`, Baja `1344`, Mohács `831` |
 
-A hivatalos **VRAQuery** API (`https://vmservice.vizugy.hu/vraquery`) autentikált hozzáférést igényel. Amíg nincs token bekötve, a Hydroinfo scraping a működő nyilvános út. Ha a scrape sikertelen, az API demó/mock adatokra esik vissza.
+**Fallback:** Hydroinfo HTML scrape → ha az is elbukik: mock adatok.
+
+Swagger: https://vmservice.vizugy.hu/vraquery/swagger/index.html
+
+### Hivatalos felhasználó (opcionális)
+
+Ha kapsz OVF / vizügy fiókot:
+
+```bash
+# .env.local / Vercel Environment Variables
+VIZUGY_USERNAME=...
+VIZUGY_PASSWORD=...
+# vagy kész token:
+VIZUGY_ACCESS_TOKEN=eyJ...
+```
+
+A kliens sorrendje: `VIZUGY_ACCESS_TOKEN` → username/password Login → open-data token.
+
+Adatforrás kényszerítése:
+
+```bash
+DATA_SOURCE=auto        # alapértelmezett: VRA → hydroinfo → mock
+DATA_SOURCE=vra         # csak VRAQuery
+DATA_SOURCE=hydroinfo   # csak HTML scrape
+```
 
 ### Győr megjegyzés
 
@@ -34,45 +61,33 @@ npm start
 
 Megnyitás: http://localhost:3000
 
-Fejlesztői mód (auto-reload):
-
 ```bash
-npm run dev
+npm run scrape   # élő forrás teszt terminálban
 ```
 
-Gyors scrape-teszt terminálban:
+## Vercel
+
+Élő URL: **https://duna-vizszint.vercel.app**
 
 ```bash
-npm run scrape
-```
-
-## Vercel deploy
-
-Élő production URL: **https://duna-vizszint.vercel.app**
-
-A gyökér `server.js` Express belépési pontot exportál (Vercel Node backend).
-
-```bash
-npx vercel login
 npx vercel --prod --yes
 ```
 
-Vagy a GitHub repo összekötése után a Vercel dashboardon: **Add New Project** → `Duna-vizszintje`.
+Opcionális env a Vercel dashboardon: `VIZUGY_USERNAME`, `VIZUGY_PASSWORD`, `VIZUGY_ACCESS_TOKEN`, `DATA_SOURCE`.
 
 ## API
 
 | Végpont | Leírás |
 | --- | --- |
 | `GET /api/levels` | Aktuális állomásadatok + 30 napos történet |
-| `GET /api/levels?force=1` | Cache megkerülése, azonnali újraolvasás |
-| `GET /api/stations` | Állomás metaadatok (küszöbök, koordináták) |
-| `GET /api/health` | Egészség / cache infó |
+| `GET /api/levels?force=1` | Cache megkerülése |
+| `GET /api/stations` | Állomás metaadatok |
+| `GET /api/health` | Cache + VRA token állapot |
 
 ## Technológia
 
-- Node.js + Express backend (scrape + 10 perces cache)
-- Statikus HTML / CSS / JS frontend
-- Leaflet + Chart.js (CDN)
+- Node.js + Express (`server.js` + `server/vra.js` + `server/scrape.js`)
+- Leaflet + Chart.js frontend
 
 ## Jogi / felelősség
 

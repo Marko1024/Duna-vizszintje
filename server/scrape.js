@@ -5,6 +5,7 @@ import {
   classifyLevel,
   trendFromChange,
 } from "./stations.js";
+import { fetchVraLevels, isVraEnabled } from "./vra.js";
 
 const HYDROINFO_TABLE =
   "https://www.hydroinfo.hu/tables/dunhid.html";
@@ -280,102 +281,135 @@ export async function fetchLiveData({ force = false } = {}) {
     return { ...cache.payload, cached: true };
   }
 
-  try {
-    const tableHtml = await fetchText(HYDROINFO_TABLE);
-    const { observedAt, byCode } = parseDailyTable(tableHtml);
+  const preferred = (process.env.DATA_SOURCE || "auto").toLowerCase();
+  const errors = [];
 
-    const yearlyResults = await mapPool(STATIONS, 2, async (station) => {
+  // 1) VRAQuery (nyilvános open-data token vagy hivatalos creds)
+  if (preferred === "auto" || preferred === "vra" || preferred === "vraquery") {
+    if (isVraEnabled()) {
       try {
-        const html = await fetchText(YEARLY_URL(station.hydroCode));
-        return parseYearlyTable(html, station.hydroCode);
-      } catch (err) {
-        return {
-          year: new Date().getFullYear(),
-          hydroCode: station.hydroCode,
-          series: [],
-          error: String(err.message || err),
+        const { stations, meta } = await fetchVraLevels({ days: 30 });
+        const payload = {
+          ok: true,
+          ...meta,
+          fetchedAt: new Date().toISOString(),
+          stations,
         };
+        cache = { fetchedAt: now, payload, error: null };
+        return { ...payload, cached: false };
+      } catch (err) {
+        errors.push(`VRAQuery: ${err.message || err}`);
+        if (preferred === "vra" || preferred === "vraquery") {
+          // force vra-only: fall through to cache/mock, skip hydroinfo
+        }
       }
-    });
-
-    const yearlyByCode = Object.fromEntries(
-      yearlyResults.map((y) => [y.hydroCode, y])
-    );
-
-    const stations = STATIONS.map((meta) => {
-      const live = byCode[meta.hydroCode] || {};
-      const yearly = yearlyByCode[meta.hydroCode];
-      const series = yearly?.series ?? [];
-      const levelCm = live.levelCm ?? null;
-      const change24hCm = live.change24hCm ?? null;
-      const classification = classifyLevel(levelCm, meta.thresholds);
-      const trend = trendFromChange(change24hCm);
-
-      // last 30 days of yearly series
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 30);
-      const cutoffKey = cutoff.toISOString().slice(0, 10);
-      const historySeries = series.filter((p) => p.date >= cutoffKey);
-
-      return {
-        ...meta,
-        levelCm,
-        levelYesterdayCm: live.levelYesterdayCm ?? null,
-        change24hCm,
-        change7dCm: weeklyChange(series, levelCm),
-        dischargeM3s: live.dischargeM3s ?? null,
-        temperatureC: live.temperatureC ?? null,
-        ...classification,
-        ...trend,
-        historySeries,
-        source: "hydroinfo",
-      };
-    });
-
-    const missing = stations.filter((s) => s.levelCm == null).length;
-    if (missing === stations.length) {
-      throw new Error("A hydroinfo táblából nem sikerült állomásadatot kinyerni");
     }
+  }
 
-    const payload = {
-      ok: true,
-      mode: "live",
-      source: "OVF Hydroinfo (hydroinfo.hu/tables/dunhid.html)",
-      sourceUrl: HYDROINFO_TABLE,
-      observedAt,
-      fetchedAt: new Date().toISOString(),
-      stations,
-      note:
-        "Az adatok az Országos Vízügyi Főigazgatóság (OVF) nyilvános Hydroinfo tábláiból származnak. Tájékoztató jellegűek.",
-    };
-
-    cache = { fetchedAt: now, payload, error: null };
-    return { ...payload, cached: false };
-  } catch (err) {
-    cache.error = String(err.message || err);
-    if (cache.payload) {
-      return {
-        ...cache.payload,
-        cached: true,
-        warning: `Élő frissítés sikertelen (${cache.error}), cache használata.`,
-      };
+  // 2) Hydroinfo HTML scrape (fallback)
+  if (preferred === "auto" || preferred === "hydroinfo") {
+    try {
+      return await fetchHydroinfoData({ now, force });
+    } catch (err) {
+      errors.push(`Hydroinfo: ${err.message || err}`);
     }
+  }
 
-    const stations = buildMockStations();
+  cache.error = errors.join(" | ") || "Ismeretlen adatforrás-hiba";
+  if (cache.payload) {
     return {
-      ok: true,
-      mode: "mock",
-      source: "mock (hydroinfo nem elérhető)",
-      sourceUrl: HYDROINFO_TABLE,
-      observedAt: null,
-      fetchedAt: new Date().toISOString(),
-      stations,
-      warning: `Élő adatlekérés sikertelen: ${cache.error}. Demó/mock adatok jelennek meg.`,
-      note:
-        "Állítsd helyre a hydroinfo.hu elérést, vagy használd a /api/levels?force=1 végpontot újrapróbáláshoz.",
-      cached: false,
+      ...cache.payload,
+      cached: true,
+      warning: `Élő frissítés sikertelen (${cache.error}), cache használata.`,
     };
   }
+
+  const stations = buildMockStations();
+  return {
+    ok: true,
+    mode: "mock",
+    source: "mock (élő források nem elérhetők)",
+    sourceUrl: HYDROINFO_TABLE,
+    observedAt: null,
+    fetchedAt: new Date().toISOString(),
+    stations,
+    warning: `Élő adatlekérés sikertelen: ${cache.error}. Demó/mock adatok jelennek meg.`,
+    note:
+      "Állítsd be a VIZUGY_* környezeti változókat, vagy ellenőrizd a hydroinfo.hu elérést.",
+    cached: false,
+  };
+}
+
+async function fetchHydroinfoData({ now }) {
+  const tableHtml = await fetchText(HYDROINFO_TABLE);
+  const { observedAt, byCode } = parseDailyTable(tableHtml);
+
+  const yearlyResults = await mapPool(STATIONS, 2, async (station) => {
+    try {
+      const html = await fetchText(YEARLY_URL(station.hydroCode));
+      return parseYearlyTable(html, station.hydroCode);
+    } catch (err) {
+      return {
+        year: new Date().getFullYear(),
+        hydroCode: station.hydroCode,
+        series: [],
+        error: String(err.message || err),
+      };
+    }
+  });
+
+  const yearlyByCode = Object.fromEntries(
+    yearlyResults.map((y) => [y.hydroCode, y])
+  );
+
+  const stations = STATIONS.map((meta) => {
+    const live = byCode[meta.hydroCode] || {};
+    const yearly = yearlyByCode[meta.hydroCode];
+    const series = yearly?.series ?? [];
+    const levelCm = live.levelCm ?? null;
+    const change24hCm = live.change24hCm ?? null;
+    const classification = classifyLevel(levelCm, meta.thresholds);
+    const trend = trendFromChange(change24hCm);
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    const cutoffKey = cutoff.toISOString().slice(0, 10);
+    const historySeries = series.filter((p) => p.date >= cutoffKey);
+
+    return {
+      ...meta,
+      levelCm,
+      levelYesterdayCm: live.levelYesterdayCm ?? null,
+      change24hCm,
+      change7dCm: weeklyChange(series, levelCm),
+      dischargeM3s: live.dischargeM3s ?? null,
+      temperatureC: live.temperatureC ?? null,
+      ...classification,
+      ...trend,
+      historySeries,
+      source: "hydroinfo",
+    };
+  });
+
+  const missing = stations.filter((s) => s.levelCm == null).length;
+  if (missing === stations.length) {
+    throw new Error("A hydroinfo táblából nem sikerült állomásadatot kinyerni");
+  }
+
+  const payload = {
+    ok: true,
+    mode: "live",
+    source: "OVF Hydroinfo (hydroinfo.hu/tables/dunhid.html)",
+    sourceUrl: HYDROINFO_TABLE,
+    observedAt,
+    fetchedAt: new Date().toISOString(),
+    stations,
+    note:
+      "Az adatok az Országos Vízügyi Főigazgatóság (OVF) nyilvános Hydroinfo tábláiból származnak. Tájékoztató jellegűek.",
+  };
+
+  cache = { fetchedAt: now, payload, error: null };
+  return { ...payload, cached: false };
 }
 
 export function getCacheInfo() {
