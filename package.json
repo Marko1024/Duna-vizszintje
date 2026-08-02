@@ -1,0 +1,19 @@
+{
+  "name": "duna-vizszint",
+  "version": "1.0.0",
+  "description": "Élő Duna vízállás oldal magyarországi mérőállomásokkal (OVF / hydroinfo.hu)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "scrape": "node server/scrape-cli.js",
+    "deploy": "vercel --prod --yes"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "node-html-parser": "^6.1.13"
+  }
+}

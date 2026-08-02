@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Duna Vízállás">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#083844"/>
+      <stop offset="55%" stop-color="#0e5f6d"/>
+      <stop offset="100%" stop-color="#1f8a9a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <path d="M0 420c80-60 160-60 240 0s160 60 240 0 160-60 240 0 160 60 240 0 160-60 240 0v210H0V420z" fill="rgba(243,247,248,0.12)"/>
+  <text x="72" y="250" fill="#f3f7f8" font-family="Georgia, serif" font-size="92" font-weight="700">Duna Vízállás</text>
+  <text x="72" y="340" fill="#d7e4e8" font-family="Arial, sans-serif" font-size="42">ÉlQ vízszint Magyarországon</text>
+  <text x="72" y="420" fill="#e0a45a" font-family="Arial, sans-serif" font-size="28">Budapest · Nagymaros · Mohács · Baja · Esztergom</text>
+</svg>

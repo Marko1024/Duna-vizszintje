@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Duna Vízállás">
+  <rect width="64" height="64" rx="14" fill="#083844"/>
+  <path d="M8 38c6-8 12-8 18 0s12 8 18 0 12-8 18 0v18H8V38z" fill="#1f8a9a"/>
+  <path d="M8 46c6-7 12-7 18 0s12 7 18 0 12-7 18 0v10H8V46z" fill="#0e5f6d"/>
+  <circle cx="46" cy="18" r="7" fill="#e0a45a"/>
+</svg>

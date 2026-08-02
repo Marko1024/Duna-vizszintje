@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Duna vízállás élőben – Budapest, Nagymaros, Mohács, Baja | Aktuális vízszint</title>
+    <meta
+      name="description"
+      content="Élő Duna vízállás Magyarországon: Budapest, Nagymaros, Esztergom, Győr (Gönyű), Dunaújváros, Baja és Mohács. Aktuális vízszint cm-ben, trend, grafikon és térkép – OVF adatok alapján."
+    />
+    <meta
+      name="keywords"
+      content="Duna vízállás, Duna vízszint, Budapest vízállás, élő vízállás, Nagymaros, Mohács, Baja, Esztergom, Dunaújváros, árvíz, kisvíz, OVF, hydroinfo"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="author" content="Duna Vízállás" />
+    <meta name="theme-color" content="#083844" />
+    <meta
+      name="google-site-verification"
+      content="VeL4NSxBMq8Uv2sBUacrFCbFFJE8S4xnEfsjqOxgjJg"
+    />
+    <link rel="canonical" href="https://duna-vizszint.vercel.app/" />
+    <link rel="alternate" hreflang="hu" href="https://duna-vizszint.vercel.app/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="hu_HU" />
+    <meta property="og:site_name" content="Duna Vízállás" />
+    <meta property="og:url" content="https://duna-vizszint.vercel.app/" />
+    <meta
+      property="og:title"
+      content="Duna vízállás élőben – Budapest, Nagymaros, Mohács, Baja | Aktuális vízszint"
+    />
+    <meta
+      property="og:description"
+      content="Élő Duna vízállás Magyarországon: Budapest és további mérőállomások, grafikonnal és térképpel."
+    />
+    <meta property="og:image" content="https://duna-vizszint.vercel.app/og.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Duna vízállás élőben – Budapest és magyar állomások"
+    />
+    <meta
+      name="twitter:description"
+      content="Aktuális Duna vízszint cm-ben, trenddel, grafikonnal és térképpel."
+    />
+    <meta name="twitter:image" content="https://duna-vizszint.vercel.app/og.svg" />
+    <!--JSON_LD-->
+    <link rel="preload" href="/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
+    <meta name="google-adsense-account" content="ca-pub-9316553426322212" />
+    <!--INITIAL_DATA-->
+  </head>
+  <body>
+    <div class="bg-grain" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="logo" href="#top">Duna Vízállás</a>
+      <nav class="nav" aria-label="Fő navigáció">
+        <a href="#allomasok">Állomások</a>
+        <a href="#grafikon">Grafikon</a>
+        <a href="#terkep">Térkép</a>
+        <a href="#gyik">GYIK</a>
+        <a href="#riasztas">Riasztás</a>
+      </nav>
+      <button type="button" class="btn btn-ghost" id="refreshBtn" title="Frissítés">
+        Frissítés
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-media" aria-hidden="true">
+          <div class="hero-wash"></div>
+        </div>
+        <div class="hero-content">
+          <p class="brand-mark">Duna Vízállás</p>
+          <h1>Élő Duna vízszint Magyarországon</h1>
+          <p class="lede">
+            Aktuális vízállás Budapesten és a fő dunai mérőállomásokon —
+            centiméterre pontosan, az Országos Vízügyi Főigazgatóság adatai
+            alapján.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#allomasok">Állomások megtekintése</a>
+            <button type="button" class="btn btn-secondary" id="heroRefreshBtn">
+              Adatok frissítése
+            </button>
+          </div>
+          <p class="meta-line" id="metaLine">Adatok betöltése…</p>
+        </div>
+      </section>
+
+      <section class="section seo-live" id="aktualis" aria-label="Aktuális vízállások">
+        <div class="section-head">
+          <h2>Aktuális Duna vízállás</h2>
+          <p>
+            Budapest, Nagymaros, Esztergom, Győr (Gönyű), Dunaújváros, Baja és
+            Mohács élő vízszintjei.
+          </p>
+        </div>
+        <div class="seo-table-wrap" id="seoLiveTable">
+          <!--SEO_LIVE_TABLE-->
+        </div>
+      </section>
+
+      <section class="section" id="allomasok">
+        <div class="section-head">
+          <h2>Mérőállomások kártyái</h2>
+          <p>
+            Aktuális vízállás, napi és heti változás, trend és színkódolt
+            státusz (kisvíz / normál / árvízfokozat).
+          </p>
+        </div>
+        <div class="legend" aria-label="Színkódolás">
+          <span class="pill status-low">Kisvíz</span>
+          <span class="pill status-normal">Normál</span>
+          <span class="pill status-flood1">I. fok</span>
+          <span class="pill status-flood2">II. fok</span>
+          <span class="pill status-flood3">III. fok</span>
+        </div>
+        <p class="gauge-note">
+          A negatív cm nem hiba: a víz a vízmérce <strong>nullpontja alatt</strong>
+          van (pl. −66 cm = 66 cm-rel a 0 pont alatt). Most tartós kisvíz van a Dunán.
+        </p>
+        <div class="station-grid" id="stationGrid"></div>
+      </section>
+
+      <!--AD_SLOT_MID-->
+
+      <section class="section" id="grafikon">
+        <div class="section-head">
+          <h2>Vízállás-alakulás grafikon</h2>
+          <p>
+            Nézd meg, hogyan változott a Duna vízszintje az elmúlt 7 vagy 30
+            napban állomásonként.
+          </p>
+        </div>
+        <div class="chart-toolbar">
+          <label>
+            Állomás
+            <select id="chartStation"></select>
+          </label>
+          <div class="segmented" role="group" aria-label="Időablak">
+            <button type="button" class="seg active" data-days="7">7 nap</button>
+            <button type="button" class="seg" data-days="30">30 nap</button>
+          </div>
+          <label class="check">
+            <input type="checkbox" id="compareFloods" />
+            2002 / 2013 árvíz szint
+          </label>
+        </div>
+        <div class="chart-shell">
+          <canvas id="levelChart" height="120"></canvas>
+        </div>
+      </section>
+
+      <section class="section" id="terkep">
+        <div class="section-head">
+          <h2>Duna mérőállomások térképe</h2>
+          <p>A vízmércék helye a folyó mentén — kattints a részletekért.</p>
+        </div>
+        <div id="map" class="map" role="region" aria-label="Duna mérőállomások térképe"></div>
+      </section>
+
+      <section class="section" id="gyik">
+        <div class="section-head">
+          <h2>Gyakori kérdések a Duna vízállásáról</h2>
+          <p>
+            Rövid válaszok azoknak, akik a „Duna vízszint” vagy „Budapest
+            vízállás” keresésre érkeznek.
+          </p>
+        </div>
+        <div class="faq">
+          <details open>
+            <summary>Mennyi most a Duna vízállása Budapesten?</summary>
+            <p>
+              Az oldal tetején és az állomáskártyákon mindig az aktuális
+              budapesti (és további) vízállást mutatjuk centiméterben, élő OVF
+              adatokból.
+            </p>
+          </details>
+          <details>
+            <summary>Miért lehet negatív a vízállás (pl. −66 cm)?</summary>
+            <p>
+              A magyar vízmércéken a vízállást a <strong>nullponthoz</strong>
+              képest mérik. Ha a vízszint a nullpont alatt van, az érték
+              negatív — ez gyakori kisvíznél, és nem azt jelenti, hogy „nincs
+              víz”, hanem hogy a referencia-szint alatt áll a folyó.
+            </p>
+          </details>
+          <details>
+            <summary>Mit jelent a kisvíz és az árvízfokozat?</summary>
+            <p>
+              Kisvíz: a jellemző alacsony tartomány. Normál: átlagos vízjárás.
+              I–III. fok: árvízvédelmi készültségi szintek a helyi küszöbök
+              szerint (Budapesten például I. fok 620 cm).
+            </p>
+          </details>
+          <details>
+            <summary>Melyik állomásokat követi az oldal?</summary>
+            <p>
+              Győr (Gönyű), Esztergom, Nagymaros, Budapest, Dunaújváros, Baja és
+              Mohács — a magyar Duna-szakasz fő vízmércéi.
+            </p>
+          </details>
+          <details>
+            <summary>Honnan jönnek az adatok?</summary>
+            <p>
+              Elsődlegesen az OVF VRAQuery API-jából, tartalékként a
+              hydroinfo.hu nyilvános tábláiból. Az értékek tájékoztató jellegűek.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section class="section" id="riasztas">
+        <div class="section-head">
+          <h2>Riasztás beállítása</h2>
+          <p>
+            Böngésző-értesítés, ha egy állomás túllépi a megadott küszöböt.
+          </p>
+        </div>
+        <form class="alert-form" id="alertForm">
+          <label>
+            Állomás
+            <select id="alertStation" required></select>
+          </label>
+          <label>
+            Küszöb (cm)
+            <input type="number" id="alertThreshold" value="500" required />
+          </label>
+          <label>
+            E-mail (opcionális, helyi mentés)
+            <input type="email" id="alertEmail" placeholder="pelda@email.hu" />
+          </label>
+          <button type="submit" class="btn btn-primary">Riasztás mentése</button>
+        </form>
+        <ul class="alert-list" id="alertList"></ul>
+      </section>
+
+      <section class="section about">
+        <div class="section-head">
+          <h2>Adatforrás és megbízhatóság</h2>
+          <p>
+            Elsődleges forrás az OVF
+            <a
+              href="https://vmservice.vizugy.hu/vraquery/swagger/index.html"
+              target="_blank"
+              rel="noopener"
+              >VRAQuery</a
+            >
+            API. Tartalék:
+            <a href="https://www.hydroinfo.hu/tables/dunhid.html" target="_blank" rel="noopener"
+              >hydroinfo.hu</a
+            >
+            és
+            <a href="https://www.vizugy.hu/" target="_blank" rel="noopener">vizugy.hu</a>.
+            Döntésekhez mindig a hivatalos vízügyi közleményeket ellenőrizd.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!--AD_SLOT_FOOTER-->
+
+    <footer class="site-footer">
+      <p>
+        <strong>Duna Vízállás</strong> · élő Duna vízszint Magyarországon ·
+        forrás: Országos Vízügyi Főigazgatóság ·
+        <a href="https://duna-vizszint.vercel.app/">duna-vizszint.vercel.app</a>
+      </p>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
