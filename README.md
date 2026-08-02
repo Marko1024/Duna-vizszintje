@@ -48,6 +48,8 @@ npm run scrape
 
 ## Vercel deploy
 
+Élő production URL: **https://duna-vizszint.vercel.app**
+
 A gyökér `server.js` Express belépési pontot exportál (Vercel Node backend).
 
 ```bash
