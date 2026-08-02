@@ -46,6 +46,17 @@ Gyors scrape-teszt terminálban:
 npm run scrape
 ```
 
+## Vercel deploy
+
+A gyökér `server.js` Express belépési pontot exportál (Vercel Node backend).
+
+```bash
+npx vercel login
+npx vercel --prod --yes
+```
+
+Vagy a GitHub repo összekötése után a Vercel dashboardon: **Add New Project** → `Duna-vizszintje`.
+
 ## API
 
 | Végpont | Leírás |

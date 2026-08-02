@@ -4,9 +4,10 @@
   "description": "Élő Duna vízállás oldal magyarországi mérőállomásokkal (OVF / hydroinfo.hu)",
   "type": "module",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "scrape": "node server/scrape-cli.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "scrape": "node server/scrape-cli.js",
+    "deploy": "vercel --prod --yes"
   },
   "engines": {
     "node": ">=18"
