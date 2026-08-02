@@ -496,6 +496,76 @@ input[type="email"] {
   text-align: center;
 }
 
+.seo-table-wrap {
+  margin-top: 1.25rem;
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.seo-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.seo-table-wrap caption {
+  text-align: left;
+  padding: 0.9rem 1rem 0.2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.seo-table-wrap th,
+.seo-table-wrap td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-top: 1px solid var(--line);
+}
+
+.seo-table-wrap th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.seo-observed {
+  margin: 0;
+  padding: 0.85rem 1rem 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.faq {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.faq details {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.faq details p {
+  margin: 0.65rem 0 0.2rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
 .leaflet-popup-content {
   margin: 0.65rem 0.8rem !important;
   font-family: var(--font-body);

@@ -65,6 +65,22 @@ Megnyitás: http://localhost:3000
 npm run scrape   # élő forrás teszt terminálban
 ```
 
+## Keresőoptimalizálás (SEO)
+
+Az élő oldal:
+- dinamikus `<title>` / description (pl. „Duna vízállás Budapest: 11 cm”)
+- JSON-LD (WebSite, FAQ, állomások)
+- `robots.txt` + `sitemap.xml`
+- szerveroldali HTML-tábla a crawlernek (JS nélkül is indexelhető)
+
+**Google Search Console** (egyszeri, a saját fiókodban):
+1. Nyisd meg: https://search.google.com/search-console
+2. Add hozzá a tulajdont: `https://duna-vizszint.vercel.app`
+3. Küldd be a sitemapet: `https://duna-vizszint.vercel.app/sitemap.xml`
+4. Opcionálisan kérj indexelést a kezdőlapra
+
+Saját domain (pl. `dunavizallas.hu`) a Vercel Domains menüben tovább erősíti a keresési láthatóságot.
+
 ## Vercel
 
 Élő URL: **https://duna-vizszint.vercel.app**

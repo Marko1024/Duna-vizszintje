@@ -45,6 +45,11 @@ function trendClass(trend) {
 }
 
 async function loadLevels(force = false) {
+  if (!force && window.__INITIAL_DATA__?.stations?.length) {
+    const boot = window.__INITIAL_DATA__;
+    window.__INITIAL_DATA__ = null;
+    return boot;
+  }
   const url = force ? "/api/levels?force=1" : "/api/levels";
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`API hiba: ${res.status}`);

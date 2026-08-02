@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { fetchLiveData, getCacheInfo } from "./server/scrape.js";
 import { STATIONS } from "./server/stations.js";
 import { getTokenInfo } from "./server/vra.js";
+import { injectSeo, loadTemplate, SITE_URL } from "./server/seo.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "public");
@@ -25,6 +26,7 @@ app.get("/api/health", (_req, res) => {
     cache: getCacheInfo(),
     vra: getTokenInfo(),
     dataSource: process.env.DATA_SOURCE || "auto",
+    siteUrl: SITE_URL,
     runtime: process.env.VERCEL ? "vercel-express" : "node",
   });
 });
@@ -46,16 +48,51 @@ app.get("/api/levels", async (req, res) => {
   }
 });
 
+/** Dinamikus sitemap lastmod-dal */
+app.get("/sitemap.xml", async (_req, res) => {
+  const now = new Date().toISOString();
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+  res.type("application/xml").send(xml);
+});
+
+async function renderHome(_req, res) {
+  try {
+    const [template, data] = await Promise.all([
+      loadTemplate(publicDir),
+      fetchLiveData({ force: false }).catch(() => null),
+    ]);
+    const html = injectSeo(template, data);
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=600"
+    );
+    res.type("html").send(html);
+  } catch (err) {
+    console.error("SSR hiba:", err);
+    res.sendFile(path.join(publicDir, "index.html"));
+  }
+}
+
+app.get("/", renderHome);
+app.get("/index.html", renderHome);
+
 app.use(
   express.static(publicDir, {
     extensions: ["html"],
     maxAge: process.env.VERCEL ? "1h" : 0,
+    index: false,
   })
 );
 
-app.use((_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
-});
+app.use(renderHome);
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
