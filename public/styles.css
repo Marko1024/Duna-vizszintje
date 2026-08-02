@@ -552,6 +552,63 @@ input[type="email"] {
   margin-bottom: -1rem;
 }
 
+.adsense-wrap {
+  padding: 0.85rem 1rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(14, 95, 109, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  min-height: 90px;
+}
+
+.adsense-wrap .adsbygoogle {
+  min-height: 90px;
+}
+
+.adsense-howto {
+  margin: 1.2rem 0 1.6rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.adsense-howto h3,
+.subhead {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.adsense-howto ol {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.adsense-howto li + li {
+  margin-top: 0.35rem;
+}
+
+.code-sample {
+  margin: 0 0 0.85rem;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: var(--river-deep);
+  color: #e7f4f6;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.howto-note,
+.lede-soft {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
 .ad-form {
   display: grid;
   gap: 0.9rem;

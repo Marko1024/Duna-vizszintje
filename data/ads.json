@@ -1,5 +1,13 @@
 {
   "contactEmail": "bfhdsjdbf@gmail.com",
+  "adsense": {
+    "enabled": false,
+    "client": "",
+    "units": {
+      "mid": "",
+      "footer": ""
+    }
+  },
   "slots": {
     "mid": {
       "label": "Szponzorált",

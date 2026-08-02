@@ -94,6 +94,52 @@ function renderAdBanner(ad, slotMeta) {
   `;
 }
 
+function renderAdsenseUnit(client, slotId) {
+  return `
+    <div class="adsense-wrap">
+      <p class="ad-banner-label">Hirdetés</p>
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client="${escapeHtml(client)}"
+        data-ad-slot="${escapeHtml(slotId)}"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+    </div>
+  `;
+}
+
+function ensureAdsenseScript(client) {
+  const id = "adsense-script";
+  if (document.getElementById(id)) return;
+  const script = document.createElement("script");
+  script.id = id;
+  script.async = true;
+  script.crossOrigin = "anonymous";
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
+  document.head.appendChild(script);
+}
+
+function pushAdsense() {
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch {
+    /* AdSense may be blocked by extensions */
+  }
+}
+
+function fillSlot(el, htmlParts) {
+  if (!el) return;
+  if (htmlParts.length) {
+    el.hidden = false;
+    el.innerHTML = htmlParts.join("");
+  } else {
+    el.hidden = true;
+    el.innerHTML = "";
+  }
+}
+
 function renderAdSlots(payload) {
   const bySlot = { mid: [], footer: [] };
   for (const ad of payload.ads || []) {
@@ -101,31 +147,38 @@ function renderAdSlots(payload) {
     bySlot[ad.slot].push(ad);
   }
 
-  const mid = $("#adSlotMid");
-  const footer = $("#adSlotFooter");
+  const adsense = payload.adsense;
+  const adsenseReady = Boolean(adsense?.enabled && adsense?.client);
+  if (adsenseReady) ensureAdsenseScript(adsense.client);
 
-  if (mid) {
-    if (bySlot.mid?.length) {
-      mid.hidden = false;
-      mid.innerHTML = bySlot.mid
-        .map((ad) => renderAdBanner(ad, payload.slots?.mid))
-        .join("");
-    } else {
-      mid.hidden = true;
-      mid.innerHTML = "";
-    }
+  const midParts = [];
+  const footerParts = [];
+
+  if (adsenseReady && adsense.units?.mid) {
+    midParts.push(renderAdsenseUnit(adsense.client, adsense.units.mid));
+  } else {
+    midParts.push(
+      ...(bySlot.mid || []).map((ad) => renderAdBanner(ad, payload.slots?.mid))
+    );
   }
 
-  if (footer) {
-    if (bySlot.footer?.length) {
-      footer.hidden = false;
-      footer.innerHTML = bySlot.footer
-        .map((ad) => renderAdBanner(ad, payload.slots?.footer))
-        .join("");
-    } else {
-      footer.hidden = true;
-      footer.innerHTML = "";
-    }
+  if (adsenseReady && adsense.units?.footer) {
+    footerParts.push(renderAdsenseUnit(adsense.client, adsense.units.footer));
+  } else {
+    footerParts.push(
+      ...(bySlot.footer || []).map((ad) =>
+        renderAdBanner(ad, payload.slots?.footer)
+      )
+    );
+  }
+
+  fillSlot($("#adSlotMid"), midParts);
+  fillSlot($("#adSlotFooter"), footerParts);
+
+  if (adsenseReady) {
+    const count =
+      (adsense.units?.mid ? 1 : 0) + (adsense.units?.footer ? 1 : 0);
+    for (let i = 0; i < count; i += 1) pushAdsense();
   }
 }
 

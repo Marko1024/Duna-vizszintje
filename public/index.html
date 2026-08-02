@@ -143,10 +143,51 @@
         <div class="section-head">
           <h2>Hirdetés az oldalon</h2>
           <p>
-            Partner megjelenés vízisport, turizmus és helyi szolgáltatásoknak.
-            Töltsd ki az űrlapot, és felvesszük veled a kapcsolatot.
+            A más weboldalakon látott automatikus bannereket a
+            <strong>Google AdSense</strong> (vagy hasonló hálózat) tölti be.
+            Partnerként közvetlenül is kérhetsz megjelenést az űrlapon.
           </p>
         </div>
+
+        <div class="adsense-howto">
+          <h3>Google AdSense (automatikus hirdetések)</h3>
+          <ol>
+            <li>
+              Regisztrálj itt:
+              <a href="https://www.google.com/adsense/" target="_blank" rel="noopener"
+                >google.com/adsense</a
+              >
+            </li>
+            <li>Add hozzá az oldalt, és várd meg a Google jóváhagyását.</li>
+            <li>
+              Az AdSense felületen hozz létre hirdetési egységeket (pl. „Display”
+              / reszponzív).
+            </li>
+            <li>
+              Másold be a kiadóazonosítót (`ca-pub-…`) és a slot ID-kat a
+              <code>data/ads.json</code> → <code>adsense</code> részébe, majd
+              állítsd <code>"enabled": true</code>-ra.
+            </li>
+          </ol>
+          <pre class="code-sample" tabindex="0">{
+  "adsense": {
+    "enabled": true,
+    "client": "ca-pub-XXXXXXXXXXXXXXXX",
+    "units": {
+      "mid": "1234567890",
+      "footer": "0987654321"
+    }
+  }</pre>
+          <p class="howto-note">
+            Amíg nincs jóváhagyott AdSense-fiókod, a slotokon partner-hirdetések
+            jelennek meg (lásd lent).
+          </p>
+        </div>
+
+        <h3 class="subhead">Közvetlen partner-megjelenés</h3>
+        <p class="lede-soft">
+          Ha céget / szolgáltatást szeretnél hirdetni az oldalon, írj nekünk:
+        </p>
         <form class="ad-form" id="adInquiryForm">
           <label>
             Név

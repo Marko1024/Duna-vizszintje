@@ -28,11 +28,42 @@ A „Győr” városi vízmérce a Rábán van. A Dunai szakaszhoz az oldal a **
 
 ## Hirdetések
 
-Két mód van hirdetés megjelenítésére:
+A más weboldalakon látott automatikus bannerek **nem** kézzel kerülnek fel: egy
+hirdetési hálózat (legtöbbször **Google AdSense**) tölti be őket.
 
-### 1) Partner hirdetés (`data/ads.json`)
+### 1) Google AdSense (mint a legtöbb oldalon)
 
-Szerkeszd a `data/ads.json` fájlt, majd indítsd újra / frissítsd az oldalt:
+1. Regisztráció: https://www.google.com/adsense/
+2. Add hozzá a domainedet, várj a jóváhagyásra (néha napok / hetek).
+3. Hozz létre hirdetési egységeket (Display / reszponzív).
+4. Írd be a kiadóazonosítót és a slot ID-kat a `data/ads.json`-ba:
+
+```json
+"adsense": {
+  "enabled": true,
+  "client": "ca-pub-XXXXXXXXXXXXXXXX",
+  "units": {
+    "mid": "1234567890",
+    "footer": "0987654321"
+  }
+}
+```
+
+Alternatíva környezeti változókkal:
+
+```bash
+ADSENSE_ENABLED=true
+ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX
+ADSENSE_SLOT_MID=1234567890
+ADSENSE_SLOT_FOOTER=0987654321
+```
+
+Ha az AdSense egy sloton be van kapcsolva, ott a partner-banner helyett a Google
+hirdetése jelenik meg.
+
+### 2) Partner hirdetés (`data/ads.json` → `ads` tömb)
+
+Közvetlen, saját szöveges megjelenés (pl. szponzor):
 
 ```json
 {
@@ -51,12 +82,12 @@ Szerkeszd a `data/ads.json` fájlt, majd indítsd újra / frissítsd az oldalt:
 
 - `slot`: `mid` (állomások után) vagy `footer` (lábléc előtt)
 - `active: false` → ideiglenes kikapcsolás
-- `startsAt` / `endsAt` → opcionális időablak (ISO dátum)
-- Kapcsolati e-mail: `contactEmail` a JSON-ban, vagy `ADS_CONTACT_EMAIL` környezeti változó
+- Kapcsolati e-mail: `contactEmail`, vagy `ADS_CONTACT_EMAIL`
 
-### 2) Hirdetésfeladás az oldalról
+### 3) Hirdetésfeladás az oldalról
 
-A látogatók a **Hirdetés** szekcióban (`/#hirdetes`) kérhetnek megjelenést. A beküldések a szerveren a `data/ad-inquiries.json` fájlba kerülnek (ez a gitben nincs nyomon követve).
+A látogatók a **Hirdetés** szekcióban (`/#hirdetes`) kérhetnek partner-megjelenést.
+A beküldések a `data/ad-inquiries.json` fájlba kerülnek (gitben nincs nyomon követve).
 
 ## Indítás
 
