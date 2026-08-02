@@ -156,6 +156,24 @@ function buildDynamicTitle(data) {
   return `Duna vízállás Budapest: ${fmtCm(bp.levelCm)} – élő vízszint Magyarországon`;
 }
 
+function buildAdSlot(slotId, extraClass = "") {
+  const id = String(slotId || "").trim();
+  if (!/^\d{5,20}$/.test(id)) return "";
+  const cls = extraClass ? `ad-slot ${extraClass}` : "ad-slot";
+  return `<aside class="${cls}" aria-label="Hirdetés">
+  <p class="ad-label">Hirdetés</p>
+  <ins
+    class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-9316553426322212"
+    data-ad-slot="${escapeHtml(id)}"
+    data-ad-format="auto"
+    data-full-width-responsive="true"
+  ></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</aside>`;
+}
+
 /**
  * @param {string} templateHtml
  * @param {object|null} data
@@ -213,6 +231,20 @@ export function injectSeo(templateHtml, data) {
   html = html.replace(
     "<!--SEO_LIVE_TABLE-->",
     `${observed}${table}`
+  );
+
+  // Manual AdSense units (optional). Auto ads still work from the head script
+  // when enabled in the AdSense dashboard for this site.
+  const midSlot =
+    process.env.ADSENSE_SLOT_MID || process.env.ADSENSE_AD_SLOT_MID || "";
+  const footerSlot =
+    process.env.ADSENSE_SLOT_FOOTER ||
+    process.env.ADSENSE_AD_SLOT_FOOTER ||
+    "";
+  html = html.replace("<!--AD_SLOT_MID-->", buildAdSlot(midSlot));
+  html = html.replace(
+    "<!--AD_SLOT_FOOTER-->",
+    buildAdSlot(footerSlot, "ad-slot-footer")
   );
 
   return html;

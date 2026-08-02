@@ -35,6 +35,11 @@ app.get("/api/stations", (_req, res) => {
   res.json({ stations: STATIONS });
 });
 
+app.get("/ads.txt", (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.type("text/plain").sendFile(path.join(publicDir, "ads.txt"));
+});
+
 app.get("/api/levels", async (req, res) => {
   try {
     const force = req.query.force === "1" || req.query.refresh === "1";
