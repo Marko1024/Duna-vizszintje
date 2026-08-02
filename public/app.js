@@ -111,6 +111,7 @@ function renderAdsenseUnit(client, slotId) {
 }
 
 function ensureAdsenseScript(client) {
+  if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
   const id = "adsense-script";
   if (document.getElementById(id)) return;
   const script = document.createElement("script");

@@ -41,7 +41,7 @@ hirdetési hálózat (legtöbbször **Google AdSense**) tölti be őket.
 ```json
 "adsense": {
   "enabled": true,
-  "client": "ca-pub-XXXXXXXXXXXXXXXX",
+  "client": "ca-pub-9316553426322212",
   "units": {
     "mid": "1234567890",
     "footer": "0987654321"
@@ -49,11 +49,15 @@ hirdetési hálózat (legtöbbször **Google AdSense**) tölti be őket.
 }
 ```
 
+A verifikációs script már benne van a `public/index.html` `<head>` részében
+(`ca-pub-9316553426322212`). Amint az oldal élő domainen fut, az AdSense
+felületen elindíthatod az oldal ellenőrzését.
+
 Alternatíva környezeti változókkal:
 
 ```bash
 ADSENSE_ENABLED=true
-ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX
+ADSENSE_CLIENT_ID=ca-pub-9316553426322212
 ADSENSE_SLOT_MID=1234567890
 ADSENSE_SLOT_FOOTER=0987654321
 ```
